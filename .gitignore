@@ -55,4 +55,34 @@ mobile/ios/build/
 # OS
 Thumbs.db
 
+# Security - Sensitive Files
+serviceAccountKey.json
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!next.config.js
+!tailwind.config.js
+!postcss.config.js
+!app.json
+!firebase.json
+!netlify.toml
+!vercel.json
+!railway.json
+!render.yaml
+!docker-compose.yml
+!docker-compose.prod.yml
+
+# API Keys and Secrets
+.env*
+*.key
+*.pem
+*.p12
+*.jks
+*.mobileprovision
+serviceAccountKey*
+firebase-adminsdk*
+google-services.json
+GoogleService-Info.plist
+
 
