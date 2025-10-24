@@ -1,0 +1,32 @@
+PORT=5000
+NODE_ENV=development
+
+# Supabase Configuration
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_DB_URL=postgresql://postgres:password@db.your-project-id.supabase.co:5432/postgres
+
+# Stripe Configuration (Optional - can add later)
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+STRIPE_BOOST_POST_PRICE_ID=price_your_boost_price_id
+STRIPE_PREMIUM_PRICE_ID=price_your_premium_price_id
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-to-random-32-chars
+JWT_EXPIRES_IN=7d
+
+# SkillCoin Configuration
+SKILLCOIN_CASHOUT_FEE_PERCENT=5
+SKILLCOIN_INITIAL_BALANCE=100
+SKILLCOIN_POST_REWARD=10
+SKILLCOIN_COMPLETE_TASK_REWARD=50
+
+# App Configuration
+CLIENT_URL=http://localhost:3000
+ADMIN_EMAIL=admin@skillchain.com
+
+# Email Configuration
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password

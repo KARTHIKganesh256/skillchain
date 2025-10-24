@@ -1,0 +1,10 @@
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://ekabgxlqhctyqgubvwir.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrYWJneGxxaGN0eWdxdWJ2d2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3NDM0MjksImV4cCI6MjA3NjMxOTQyOX0.9bippEr7GzWSb_ryVtmQc8J46YwWw8YuTGuzecjEUPY
+
+# Stripe Configuration (Optional - can add later)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+
