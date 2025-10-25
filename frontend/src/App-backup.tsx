@@ -13,6 +13,7 @@ import {
   Play,
   CheckCircle,
   DollarSign,
+  Target,
   BookOpen,
   BarChart3,
   Network,
@@ -23,15 +24,15 @@ import {
 } from 'lucide-react';
 
 // Import UI Components
-import { Button } from './components/ui/button.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card.tsx';
-import { Badge } from './components/ui/badge.tsx';
-import { Progress } from './components/ui/progress.tsx';
+import { Button } from './components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
+import { Badge } from './components/ui/badge';
+import { Progress } from './components/ui/progress';
 
 // Import Pages
-import CalculatorPage from './pages/Calculator.tsx';
-import AIAssistantPage from './pages/AIAssistant.tsx';
-import SkillGraphPage from './pages/SkillGraph.tsx';
+import CalculatorPage from './pages/Calculator';
+import AIAssistantPage from './pages/AIAssistant';
+import SkillGraphPage from './pages/SkillGraph';
 
 // Mock Data
 const mockSkills = [
