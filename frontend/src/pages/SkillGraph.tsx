@@ -15,7 +15,7 @@ const SkillGraphPage: React.FC = () => {
 
   const fetchSkillGraph = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/skill-graph/1');
+      const response = await fetch('http://localhost:8000/api/skillgraph/data');
       const data = await response.json();
       setSkillGraph(data);
     } catch (error) {

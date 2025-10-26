@@ -35,19 +35,144 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 1. AI Smart Skill Value Calculator - Enhanced
-app.get('/api/skills', (req, res) => {
-  res.json({
+// Departments and Skills Data
+const departments = [
+  {
+    id: 1,
+    name: 'Computer Science and Engineering',
+    code: 'CSE',
+    coreFocus: 'Software, AI, Data Science, Cloud',
     skills: [
-      { id: 1, name: 'JavaScript', category: 'Programming', value: 100, level: 8, market_demand: 'high' },
-      { id: 2, name: 'Python', category: 'Programming', value: 95, level: 7, market_demand: 'very_high' },
-      { id: 3, name: 'React', category: 'Frontend', value: 90, level: 6, market_demand: 'high' },
-      { id: 4, name: 'Node.js', category: 'Backend', value: 85, level: 5, market_demand: 'medium' },
-      { id: 5, name: 'TypeScript', category: 'Programming', value: 88, level: 6, market_demand: 'high' },
-      { id: 6, name: 'Vue.js', category: 'Frontend', value: 75, level: 4, market_demand: 'medium' },
-      { id: 7, name: 'Docker', category: 'DevOps', value: 80, level: 5, market_demand: 'high' },
-      { id: 8, name: 'AWS', category: 'Cloud', value: 92, level: 7, market_demand: 'very_high' }
+      { name: 'JavaScript', type: 'Programming Language', category: 'Frontend/Backend' },
+      { name: 'Python', type: 'Programming Language', category: 'Data Science, AI' },
+      { name: 'Java', type: 'Programming Language', category: 'Enterprise, Backend' },
+      { name: 'C/C++', type: 'Programming Language', category: 'Systems Programming' },
+      { name: 'React', type: 'Framework', category: 'Frontend' },
+      { name: 'Node.js', type: 'Runtime', category: 'Backend' },
+      { name: 'Docker', type: 'DevOps Tool', category: 'Containerization' },
+      { name: 'AWS', type: 'Cloud Platform', category: 'Cloud Computing' },
+      { name: 'Machine Learning', type: 'Technology', category: 'AI/ML' },
+      { name: 'Database Management', type: 'Technology', category: 'Data Management' }
     ]
+  },
+  {
+    id: 2,
+    name: 'Artificial Intelligence & Machine Learning',
+    code: 'AIML',
+    coreFocus: 'Deep Learning, Automation',
+    skills: [
+      { name: 'Python', type: 'Programming Language', category: 'Primary Language' },
+      { name: 'TensorFlow', type: 'Framework', category: 'Deep Learning' },
+      { name: 'PyTorch', type: 'Framework', category: 'Deep Learning' },
+      { name: 'Keras', type: 'Framework', category: 'Neural Networks' },
+      { name: 'Computer Vision', type: 'Technology', category: 'AI' },
+      { name: 'NLP', type: 'Technology', category: 'Natural Language Processing' },
+      { name: 'Data Science', type: 'Technology', category: 'Analytics' },
+      { name: 'R Programming', type: 'Programming Language', category: 'Data Analysis' }
+    ]
+  },
+  {
+    id: 3,
+    name: 'Electronics and Communication Engineering',
+    code: 'ECE',
+    coreFocus: 'IoT, Telecom, Embedded Systems',
+    skills: [
+      { name: 'C/C++', type: 'Programming Language', category: 'Embedded Systems' },
+      { name: 'Python', type: 'Programming Language', category: 'IoT Applications' },
+      { name: 'Arduino', type: 'Platform', category: 'Microcontrollers' },
+      { name: 'Raspberry Pi', type: 'Platform', category: 'IoT Development' },
+      { name: 'VLSI Design', type: 'Technology', category: 'Chip Design' },
+      { name: 'Signal Processing', type: 'Technology', category: 'Digital Processing' },
+      { name: 'MATLAB', type: 'Tool', category: 'Simulation' }
+    ]
+  },
+  {
+    id: 4,
+    name: 'Electrical Engineering',
+    code: 'EE',
+    coreFocus: 'Power Systems, Renewable Energy',
+    skills: [
+      { name: 'MATLAB', type: 'Tool', category: 'Simulation' },
+      { name: 'Python', type: 'Programming Language', category: 'Data Analysis' },
+      { name: 'PLC Programming', type: 'Technology', category: 'Industrial Automation' },
+      { name: 'Power System Analysis', type: 'Knowledge', category: 'Power Engineering' },
+      { name: 'SCADA', type: 'System', category: 'Industrial Control' },
+      { name: 'Renewable Energy Systems', type: 'Technology', category: 'Green Energy' }
+    ]
+  },
+  {
+    id: 5,
+    name: 'Mechanical Engineering',
+    code: 'ME',
+    coreFocus: 'Manufacturing, Robotics, Design',
+    skills: [
+      { name: 'AutoCAD', type: 'Software', category: 'CAD Design' },
+      { name: 'SolidWorks', type: 'Software', category: '3D Modeling' },
+      { name: 'MATLAB', type: 'Tool', category: 'Simulation' },
+      { name: 'Python', type: 'Programming Language', category: 'Automation' },
+      { name: 'Robotics', type: 'Technology', category: 'Automation' },
+      { name: 'CNC Programming', type: 'Technology', category: 'Manufacturing' },
+      { name: 'Finite Element Analysis', type: 'Technology', category: 'Structural Analysis' }
+    ]
+  }
+];
+
+// 1. Get all departments with their skills
+app.get('/api/departments', (req, res) => {
+  res.json({
+    success: true,
+    departments: departments
+  });
+});
+
+// 2. Get skills for a specific department
+app.get('/api/departments/:deptId/skills', (req, res) => {
+  const deptId = parseInt(req.params.deptId);
+  const department = departments.find(d => d.id === deptId);
+  
+  if (!department) {
+    return res.status(404).json({
+      success: false,
+      message: 'Department not found'
+    });
+  }
+  
+  res.json({
+    success: true,
+    department: {
+      id: department.id,
+      name: department.name,
+      code: department.code,
+      coreFocus: department.coreFocus
+    },
+    skills: department.skills
+  });
+});
+
+// 3. Get all skills (flattened across departments)
+app.get('/api/skills', (req, res) => {
+  const allSkills = [];
+  departments.forEach(dept => {
+    dept.skills.forEach(skill => {
+      allSkills.push({
+        id: allSkills.length + 1,
+        name: skill.name,
+        department: dept.name,
+        departmentCode: dept.code,
+        type: skill.type,
+        category: skill.category,
+        value: Math.floor(Math.random() * 40) + 60, // Random value 60-100
+        level: Math.floor(Math.random() * 5) + 4, // Random level 4-8
+        market_demand: ['low', 'medium', 'high', 'very_high'][Math.floor(Math.random() * 4)]
+      });
+    });
+  });
+  
+  res.json({
+    success: true,
+    skills: allSkills,
+    totalSkills: allSkills.length,
+    departments: departments.length
   });
 });
 
@@ -694,6 +819,139 @@ app.get('/api/analytics/users', (req, res) => {
     activeUsers: 890,
     newUsers: 45,
     skillcoinCirculation: 125000
+  });
+});
+
+// Auth endpoints
+app.post('/api/auth/register', (req, res) => {
+  const { fullName, email, password } = req.body;
+  
+  // Validate input
+  if (!fullName || !email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide fullName, email, and password'
+    });
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid email format'
+    });
+  }
+
+  // Validate password length
+  if (password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: 'Password must be at least 6 characters long'
+    });
+  }
+
+  // In a real app, you would:
+  // 1. Check if user already exists
+  // 2. Hash the password
+  // 3. Save to database
+  // For now, we'll just return success
+  
+  console.log('New user registration:', { fullName, email });
+  
+  res.status(201).json({
+    success: true,
+    message: 'User registered successfully',
+    user: {
+      id: Date.now(),
+      fullName,
+      email,
+      createdAt: new Date().toISOString()
+    }
+  });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  // Validate input
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide email and password'
+    });
+  }
+
+  // In a real app, you would:
+  // 1. Find user by email
+  // 2. Verify password
+  // 3. Generate JWT token
+  // For now, we'll just return success
+  
+  console.log('User login attempt:', { email });
+  
+  res.json({
+    success: true,
+    message: 'Login successful',
+    token: 'mock-jwt-token-' + Date.now(),
+    user: {
+      id: 1,
+      email,
+      fullName: 'Test User'
+    }
+  });
+});
+
+// Profile Setup Endpoint
+app.post('/api/profile/setup', (req, res) => {
+  const { 
+    college, 
+    department, 
+    course, 
+    year, 
+    rollNumber, 
+    phone, 
+    address, 
+    emergencyContact, 
+    emergencyPhone 
+  } = req.body;
+
+  // Validate required fields
+  if (!college || !department || !course || !year || !rollNumber) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide all required fields'
+    });
+  }
+
+  // In a real app, you would:
+  // 1. Get user ID from JWT token
+  // 2. Save profile data to database
+  // For now, we'll just return success
+  
+  console.log('Profile setup for user:', { 
+    college, 
+    department, 
+    course, 
+    year, 
+    rollNumber 
+  });
+  
+  res.json({
+    success: true,
+    message: 'Profile setup completed successfully',
+    profile: {
+      college,
+      department,
+      course,
+      year,
+      rollNumber,
+      phone,
+      address,
+      emergencyContact,
+      emergencyPhone,
+      completedAt: new Date().toISOString()
+    }
   });
 });
 

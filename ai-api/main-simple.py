@@ -130,6 +130,12 @@ async def get_skill_graph_data():
         }
     }
 
+@app.get("/api/skill-graph/{user_id}")
+async def get_user_skill_graph(user_id: int):
+    """Get skill graph data for a specific user (fallback endpoint for legacy calls)"""
+    # Redirect to the general skill graph data
+    return await get_skill_graph_data()
+
 # 3. Reels & AI Learning Q&A with Speech Recognition
 @app.post("/api/learning/assist")
 async def learning_assistance(request: LearningRequest):
