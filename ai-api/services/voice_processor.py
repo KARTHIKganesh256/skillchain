@@ -8,7 +8,7 @@ import speech_recognition as sr
 import librosa
 import soundfile as sf
 import numpy as np
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import logging
 import httpx
 import json

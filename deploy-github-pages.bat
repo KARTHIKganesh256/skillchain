@@ -47,3 +47,9 @@ echo ✅ Deployment complete!
 echo Your SkillChain app is now live on GitHub Pages!
 echo.
 pause
+
+
+
+
+
+

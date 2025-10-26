@@ -120,6 +120,27 @@ async def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow()}
 
 # Skill Value Calculator endpoints
+@app.get("/api/skills/calculate")
+async def calculate_skill_value_simple(
+    skill: str,
+    level: int = 5,
+    current_user: dict = Depends(get_current_user)
+):
+    """Simple skill value calculation endpoint"""
+    try:
+        result = await skill_calculator.calculate_value(
+            skill_name=skill,
+            user_experience=level,
+            market_demand=None,
+            complexity=None,
+            location=None,
+            industry=None
+        )
+        return {"estimated_value": result["estimated_value"]}
+    except Exception as e:
+        logger.error(f"Error calculating skill value: {str(e)}")
+        return {"estimated_value": 0}
+
 @app.post("/api/v1/skill-value/calculate", response_model=SkillValueResponse)
 async def calculate_skill_value(
     request: SkillValueRequest,
@@ -154,6 +175,78 @@ async def get_skill_trends(
         raise HTTPException(status_code=500, detail="Failed to get skill trends")
 
 # Learning Assistant endpoints
+@app.post("/api/learning/assist")
+async def assist_learning_simple(
+    question: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Simple learning assistance endpoint"""
+    try:
+        response = await learning_assistant.answer_question(
+            question=question,
+            skill_id="general",
+            user_id=current_user.get("user_id", "default"),
+            context=None,
+            language="en"
+        )
+        return {"answer": response["answer"]}
+    except Exception as e:
+        logger.error(f"Error processing learning question: {str(e)}")
+        return {"answer": "I'm sorry, I couldn't process your question. Please try again."}
+
+@app.post("/api/learning/path")
+async def generate_learning_path_simple(
+    skill: str,
+    current_level: int = 3,
+    goal_level: int = 7,
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate simple learning path"""
+    try:
+        # Mock learning path generation
+        steps = []
+        for level in range(current_level, goal_level + 1):
+            steps.append({
+                "level": level,
+                "title": f"{skill} Level {level}",
+                "description": f"Master {skill} concepts at level {level}",
+                "resources": [
+                    f"Online course for {skill} level {level}",
+                    f"Practice exercises for {skill}"
+                ]
+            })
+        return {"steps": steps}
+    except Exception as e:
+        logger.error(f"Error generating learning path: {str(e)}")
+        return {"steps": []}
+
+@app.post("/api/learning/quiz")
+async def generate_quiz_simple(
+    skill: str,
+    level: str = "beginner",
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate simple quiz"""
+    try:
+        # Mock quiz generation
+        quiz = [
+            {
+                "question": f"What is the most important concept in {skill}?",
+                "options": [
+                    "Basic syntax",
+                    "Advanced algorithms", 
+                    "Best practices",
+                    "All of the above"
+                ],
+                "correct": 3,
+                "explanation": f"All concepts are important for mastering {skill}"
+            }
+        ]
+        return {"questions": quiz}
+    except Exception as e:
+        logger.error(f"Error generating quiz: {str(e)}")
+        return {"questions": []}
+
 @app.post("/api/v1/learning/question", response_model=LearningQuestionResponse)
 async def ask_learning_question(
     request: LearningQuestionRequest,
@@ -191,6 +284,23 @@ async def analyze_voice_input(
         raise HTTPException(status_code=500, detail="Failed to analyze voice input")
 
 # Recommendation Engine endpoints
+@app.get("/api/recommendations/{user_id}")
+async def get_recommendations_simple(
+    user_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Simple recommendations endpoint"""
+    try:
+        recommendations = await recommendation_engine.get_recommendations(
+            user_id=user_id,
+            recommendation_type="learn",
+            limit=5
+        )
+        return {"recommendations": recommendations["recommendations"]}
+    except Exception as e:
+        logger.error(f"Error getting recommendations: {str(e)}")
+        return {"recommendations": []}
+
 @app.post("/api/v1/recommendations", response_model=RecommendationResponse)
 async def get_recommendations(
     request: RecommendationRequest,

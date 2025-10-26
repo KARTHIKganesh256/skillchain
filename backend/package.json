@@ -4,7 +4,7 @@
   "description": "SkillChain Backend API",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node server-simple.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "test": "jest",

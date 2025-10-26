@@ -93,3 +93,8 @@ BACKEND_URL=https://your-backend-url.railway.app
 - Railway Docs: https://docs.railway.app
 - Vercel Docs: https://vercel.com/docs
 - Render Docs: https://render.com/docs
+
+
+
+
+

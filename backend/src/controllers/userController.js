@@ -1,8 +1,74 @@
 /**
- * User Controller
+ * User Controller - Complete implementation
  */
 
 const { getFirestore } = require('../config/firebase');
+
+/**
+ * Get all users (with pagination and filters)
+ */
+exports.getAllUsers = async (req, res) => {
+  try {
+    const db = getFirestore();
+    const { 
+      limit = 20, 
+      offset = 0, 
+      search = '', 
+      skills = '', 
+      location = '',
+      verified = null 
+    } = req.query;
+
+    let query = db.collection('users');
+
+    // Apply filters
+    if (search) {
+      query = query.where('displayName', '>=', search)
+                   .where('displayName', '<=', search + '\uf8ff');
+    }
+
+    if (verified !== null) {
+      query = query.where('isVerified', '==', verified === 'true');
+    }
+
+    if (location) {
+      query = query.where('location', '==', location);
+    }
+
+    // Apply pagination
+    query = query.limit(parseInt(limit)).offset(parseInt(offset));
+
+    const usersSnapshot = await query.get();
+    const users = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      // Remove sensitive information
+      delete data.fcmToken;
+      delete data.stripeCustomerId;
+      return {
+        id: doc.id,
+        ...data
+      };
+    });
+
+    res.json({
+      success: true,
+      data: {
+        users,
+        pagination: {
+          limit: parseInt(limit),
+          offset: parseInt(offset),
+          total: users.length
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get all users error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get users'
+    });
+  }
+};
 
 /**
  * Get current user profile
@@ -465,6 +531,217 @@ exports.updateFCMToken = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to update FCM token'
+    });
+  }
+};
+
+/**
+ * Get user ledger (transaction history)
+ */
+exports.getUserLedger = async (req, res) => {
+  try {
+    const db = getFirestore();
+    const { id } = req.params;
+    const { limit = 50, offset = 0 } = req.query;
+
+    // Check authorization
+    if (req.user.uid !== id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const transactions = await db.collection('transactions')
+      .where('userId', '==', id)
+      .orderBy('createdAt', 'desc')
+      .limit(parseInt(limit))
+      .offset(parseInt(offset))
+      .get();
+
+    const ledger = transactions.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    res.json({
+      success: true,
+      data: ledger
+    });
+  } catch (error) {
+    console.error('Get user ledger error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get transaction history'
+    });
+  }
+};
+
+/**
+ * Add transaction to user ledger
+ */
+exports.addTransaction = async (req, res) => {
+  try {
+    const db = getFirestore();
+    const { id } = req.params;
+    const { type, amount, description, postId, matchId } = req.body;
+
+    // Check authorization
+    if (req.user.uid !== id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const transaction = {
+      userId: id,
+      type, // 'credit' or 'debit'
+      amount: parseFloat(amount),
+      description,
+      postId: postId || null,
+      matchId: matchId || null,
+      createdAt: new Date().toISOString()
+    };
+
+    await db.collection('transactions').add(transaction);
+
+    // Update user's SkillCoin balance
+    const userRef = db.collection('users').doc(id);
+    const userDoc = await userRef.get();
+    const currentBalance = userDoc.data().skillCoinBalance || 0;
+    
+    const newBalance = type === 'credit' 
+      ? currentBalance + parseFloat(amount)
+      : currentBalance - parseFloat(amount);
+
+    await userRef.update({
+      skillCoinBalance: newBalance,
+      updatedAt: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      message: 'Transaction added successfully',
+      data: {
+        transaction,
+        newBalance
+      }
+    });
+  } catch (error) {
+    console.error('Add transaction error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to add transaction'
+    });
+  }
+};
+
+/**
+ * Get user skills (offered and needed)
+ */
+exports.getUserSkills = async (req, res) => {
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection('users').doc(req.params.id).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const userData = userDoc.data();
+
+    res.json({
+      success: true,
+      data: {
+        skillsOffered: userData.skillsOffered || [],
+        skillsNeeded: userData.skillsNeeded || []
+      }
+    });
+  } catch (error) {
+    console.error('Get user skills error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user skills'
+    });
+  }
+};
+
+/**
+ * Add skill to user profile
+ */
+exports.addUserSkill = async (req, res) => {
+  try {
+    const db = getFirestore();
+    const { id } = req.params;
+    const { skill, type } = req.body; // type: 'offered' or 'needed'
+
+    // Check authorization
+    if (req.user.uid !== id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const userRef = db.collection('users').doc(id);
+    const field = type === 'offered' ? 'skillsOffered' : 'skillsNeeded';
+
+    await userRef.update({
+      [field]: require('firebase-admin').firestore.FieldValue.arrayUnion(skill),
+      updatedAt: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      message: 'Skill added successfully'
+    });
+  } catch (error) {
+    console.error('Add skill error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to add skill'
+    });
+  }
+};
+
+/**
+ * Remove skill from user profile
+ */
+exports.removeUserSkill = async (req, res) => {
+  try {
+    const db = getFirestore();
+    const { id, skillId } = req.params;
+    const { type } = req.body;
+
+    // Check authorization
+    if (req.user.uid !== id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const userRef = db.collection('users').doc(id);
+    const field = type === 'offered' ? 'skillsOffered' : 'skillsNeeded';
+
+    await userRef.update({
+      [field]: require('firebase-admin').firestore.FieldValue.arrayRemove(skillId),
+      updatedAt: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      message: 'Skill removed successfully'
+    });
+  } catch (error) {
+    console.error('Remove skill error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to remove skill'
     });
   }
 };
