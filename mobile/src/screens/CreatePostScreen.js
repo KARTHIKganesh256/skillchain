@@ -45,6 +45,63 @@ export default function CreatePostScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, backgroundColor: '#fff' }, content: { padding: 16 }, label: { fontSize: 12, fontWeight: 'bold', marginTop: 16, marginBottom: 8 }, typeButtons: { flexDirection: 'row', gap: 12 }, typeButton: { flex: 1, padding: 16, borderWidth: 2, borderColor: '#000', alignItems: 'center' }, typeButtonActive: { backgroundColor: '#000' }, typeButtonText: { fontWeight: 'bold' }, typeButtonTextActive: { color: '#fff' }, input: { borderWidth: 2, borderColor: '#000', padding: 12, fontSize: 16 }, textArea: { height: 100, textAlignVertical: 'top' }, submitButton: { backgroundColor: '#000', padding: 16, alignItems: 'center', borderWidth: 2, borderColor: '#000', marginTop: 24 }, submitButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' } });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  content: {
+    padding: 16,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  typeButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  typeButton: {
+    flex: 1,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#000',
+    alignItems: 'center',
+  },
+  typeButtonActive: {
+    backgroundColor: '#000',
+  },
+  typeButtonText: {
+    fontWeight: 'bold',
+  },
+  typeButtonTextActive: {
+    color: '#fff',
+  },
+  input: {
+    borderWidth: 2,
+    borderColor: '#000',
+    padding: 12,
+    fontSize: 16,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  submitButton: {
+    backgroundColor: '#000',
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#000',
+    marginTop: 24,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
 
 

@@ -1,3 +1,26 @@
+# Supabase Setup for SkillChain Auth and Admin Roles
+
+1) Create a Supabase project and grab the URL and `anon` key.
+
+2) In `frontend/.env` (or your React env), set:
+
+```
+REACT_APP_SUPABASE_URL=YOUR_SUPABASE_URL
+REACT_APP_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+3) In Supabase SQL editor, run the SQL in `SUPABASE_DATABASE_SETUP.sql` to create the `user_roles` table with RLS.
+
+4) Mark admins by inserting rows (use the SQL editor with service role context):
+
+```
+insert into public.user_roles (user_id, role)
+values ('<auth.users.id for the admin>', 'admin')
+on conflict (user_id) do update set role = excluded.role;
+```
+
+5) In the app, users sign in with email/password. After login, the app reads `user_roles` to set role `admin` or `user` and stores it in localStorage under `role`.
+
 # 🚀 Supabase Setup Guide for SkillChain
 
 ## 📋 **Overview**

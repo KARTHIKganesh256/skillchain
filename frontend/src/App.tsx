@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Brain, 
@@ -25,7 +25,21 @@ import {
   MessageSquare,
   Send,
   ThumbsUp,
-  Clock
+  Clock,
+  Target,
+  Briefcase,
+  Shield,
+  Code,
+  Trophy,
+  Crown,
+  Terminal,
+  FileText,
+  Menu,
+  X,
+  ChevronDown,
+  ChevronsLeft,
+  ChevronsRight,
+  Palette
 } from 'lucide-react';
 
 // Import UI Components
@@ -33,6 +47,8 @@ import { Button } from './components/ui/button.tsx';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card.tsx';
 import { Badge } from './components/ui/badge.tsx';
 import { Progress } from './components/ui/progress.tsx';
+import SkillDetailModal from './components/skills/SkillDetailModal.tsx';
+import { fetchSkillOverview, type SkillOverview } from './lib/knowledge.ts';
 
 // Import Pages
 import CalculatorPage from './pages/Calculator.tsx';
@@ -45,6 +61,29 @@ import Profile from './pages/Profile.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import DreamSeed from './pages/DreamSeed.tsx';
 import VerifiedProfessionals from './pages/VerifiedProfessionals.tsx';
+import Community from './pages/Community.tsx';
+
+// Import New Gamified Components
+import TaskDashboard from './components/tasks/TaskDashboard.tsx';
+import CoinMarketplace from './components/marketplace/CoinMarketplace.tsx';
+import LiveArena from './components/arena/LiveArena.tsx';
+import AISkillMatch from './components/ai/AISkillMatch.tsx';
+
+// Import Story-Driven Components
+import LandingPage from './components/story/LandingPage.tsx';
+import SkillMap from './components/story/SkillMap.tsx';
+import LiveArenaStory from './components/story/LiveArenaStory.tsx';
+
+// Import SkillChain Components
+import SkillChainHomepage from './components/codechef/CodeChefHomepage.tsx';
+import ProblemsPage from './components/codechef/ProblemsPage.tsx';
+import ContestsPage from './components/codechef/ContestsPage.tsx';
+import LeaderboardPage from './components/codechef/LeaderboardPage.tsx';
+import CodeEditor from './components/codechef/CodeEditor.tsx';
+import SubmissionsPage from './components/codechef/SubmissionsPage.tsx';
+import UserProfile from './components/codechef/UserProfile.tsx';
+import DiscussionsPage from './components/codechef/DiscussionsPage.tsx';
+import RewardsChamber from './components/story/RewardsChamber.tsx';
 
 // Mock Data
 const mockSkills = [
@@ -66,10 +105,27 @@ const mockUsers = [
 ];
 
 // Enhanced Navigation Component
-const Navbar: React.FC = () => {
+type NavbarProps = {
+  isSidebarCollapsed: boolean;
+  onToggleSidebar: (next: boolean) => void;
+};
+
+const Navbar: React.FC<NavbarProps> = ({ isSidebarCollapsed, onToggleSidebar }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const [isMainOpen, setIsMainOpen] = useState<boolean>(true);
+  const [isFeaturesOpen, setIsFeaturesOpen] = useState<boolean>(true);
+  const [isThemePanelOpen, setIsThemePanelOpen] = useState(false);
+  const [accentColor, setAccentColor] = useState<string>(() => {
+    try { return localStorage.getItem('ui.accent') || '#ea580c'; } catch { return '#ea580c'; }
+  });
+  const [isHighContrast, setIsHighContrast] = useState<boolean>(() => {
+    try { return (localStorage.getItem('ui.contrast') || 'false') === 'true'; } catch { return false; }
+  });
 
   useEffect(() => {
     if (isDarkMode) {
@@ -78,6 +134,16 @@ const Navbar: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  // Accent and contrast
+  useEffect(() => {
+    try { localStorage.setItem('ui.accent', accentColor); } catch {}
+    document.documentElement.style.setProperty('--accent-color', accentColor);
+  }, [accentColor]);
+
+  useEffect(() => {
+    try { localStorage.setItem('ui.contrast', String(isHighContrast)); } catch {}
+  }, [isHighContrast]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,99 +158,284 @@ const Navbar: React.FC = () => {
     const token = localStorage.getItem('token');
     const userName = localStorage.getItem('userName');
     setIsLoggedIn(!!token || !!userName);
+    const mainOpen = localStorage.getItem('nav.main.open');
+    const featOpen = localStorage.getItem('nav.features.open');
+    if (mainOpen !== null) setIsMainOpen(mainOpen === 'true');
+    if (featOpen !== null) setIsFeaturesOpen(featOpen === 'true');
+    // collapsed state is controlled by parent; parent initializes from localStorage
   }, []);
 
-  const navItems = [
-    { name: 'Skills', href: '/skills', icon: BookOpen },
-    { name: 'Users', href: '/users', icon: Users },
-    { name: 'Verified Pros', href: '/verified-professionals', icon: UserCheck },
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMoreMenuOpen) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.relative')) {
+          setIsMoreMenuOpen(false);
+        }
+      }
+      if (isMobileMenuOpen) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('nav')) {
+          setIsMobileMenuOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMoreMenuOpen, isMobileMenuOpen]);
+
+  const mainNavItems = [
+    { name: 'Home', href: '/home', icon: Sparkles },
+    { name: 'Problems', href: '/problems', icon: Code },
+    { name: 'Contests', href: '/contests', icon: Trophy },
+    { name: 'Leaderboard', href: '/leaderboard', icon: Crown },
+    { name: 'Code Editor', href: '/editor', icon: Terminal },
+    { name: 'Submissions', href: '/submissions', icon: FileText },
+    { name: 'Profile', href: '/profile', icon: User },
+    { name: 'Discussions', href: '/discussions', icon: MessageSquare }
+  ];
+
+  const moreNavItems = [
+    { name: 'Skill Realms', href: '/skill-map', icon: Shield },
+    { name: 'Task Forge', href: '/tasks', icon: Target },
+    { name: 'Rewards Chamber', href: '/marketplace', icon: DollarSign },
+    { name: 'Motivational Arena', href: '/live-arena-story', icon: Video },
+    { name: 'AI Oracle', href: '/ai-jobs', icon: Briefcase },
+    { name: 'Skills Library', href: '/skills', icon: BookOpen },
+    { name: 'Verified Guardians', href: '/verified-professionals', icon: UserCheck },
     { name: 'Dream Seed', href: '/dreamseed', icon: Sparkles },
     { name: 'Calculator', href: '/calculator', icon: Calculator },
     { name: 'AI Assistant', href: '/ai-assistant', icon: Brain },
-    { name: 'SkillGraph', href: '/skillgraph', icon: Network },
-    { name: 'Reels', href: '/reels', icon: Video },
-    { name: 'Portfolios', href: '/portfolios', icon: UserCheck },
-    { name: 'Recommendations', href: '/recommendations', icon: TrendingUp },
-    { name: 'TimeToken', href: '/timetoken', icon: DollarSign },
-    { name: 'Gamification', href: '/gamification', icon: Award },
-    { name: 'SkillMap', href: '/skillmap', icon: MapPin },
-    { name: 'Voice Bot', href: '/voice-bot', icon: Mic },
-    { name: 'Disputes', href: '/disputes', icon: Gavel }
+    { name: 'SkillGraph', href: '/skillgraph', icon: Network }
   ];
 
   return (
-    <motion.nav 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/20' 
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="container mx-auto px-4 py-4">
+    <>
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <motion.aside 
+        initial={{ x: -300 }}
+        animate={{ x: 0 }}
+        className={`fixed left-0 top-0 h-full ${isSidebarCollapsed ? 'w-16' : 'w-64'} bg-white dark:bg-gray-900 border-r ${isHighContrast ? 'border-gray-300 dark:border-gray-600' : 'border-gray-200 dark:border-gray-700'} z-50 flex flex-col overflow-visible transform transition-transform duration-300 nav-accent ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+      >
+      <style>{` :root{ --accent-color: ${accentColor}; } .nav-accent a.group:hover .accent-on-hover{ color: var(--accent-color) !important; } `}</style>
+      {/* Logo Section */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
+          <Link to="/" className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+              <Code className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              SkillChain
-            </span>
-          </Link>
-          
-          <div className="hidden lg:flex items-center space-x-1">
-            {navItems.slice(0, 6).map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                <item.icon className="w-4 h-4" />
-                <span>{item.name}</span>
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="rounded-full"
-            >
-              {isDarkMode ? '☀️' : '🌙'}
-            </Button>
-            {isLoggedIn ? (
-              <Link to="/profile">
-                <Button 
-                  variant="outline"
-                  className="flex items-center space-x-2"
-                >
-                  <User className="w-4 h-4" />
-                  <span>Profile</span>
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Button 
-                  variant="ghost"
-                  onClick={() => window.location.href = '/login'}
-                >
-                  Login
-                </Button>
-                <Button 
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                  onClick={() => window.location.href = '/register'}
-                >
-                  Get Started
-                </Button>
-              </>
+            {!isSidebarCollapsed && (
+              <div>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">SkillChain</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">SkillChain Platform</p>
+              </div>
             )}
-          </div>
+          </Link>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              const next = !isSidebarCollapsed;
+              onToggleSidebar(next);
+              try { localStorage.setItem('nav.sidebar.collapsed', String(next)); } catch {}
+            }}
+            className="ml-2"
+          >
+            {isSidebarCollapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
+          </Button>
         </div>
       </div>
-    </motion.nav>
+
+      {/* Navigation Menu */}
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <div className="space-y-1">
+          <div className="flex items-center justify-between mb-3">
+            {!isSidebarCollapsed && (
+              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Main
+              </div>
+            )}
+            <button
+              aria-label={isMainOpen ? 'Collapse main' : 'Expand main'}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              onClick={() => {
+                const next = !isMainOpen;
+                setIsMainOpen(next);
+                try { localStorage.setItem('nav.main.open', String(next)); } catch {}
+              }}
+            >
+              {!isSidebarCollapsed && (isMainOpen ? '−' : '+')}
+            </button>
+          </div>
+          {(isMainOpen || isSidebarCollapsed) && mainNavItems.map((item) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <item.icon className={`${isSidebarCollapsed ? 'w-6 h-6' : 'w-5 h-5'} accent-on-hover`} />
+              {!isSidebarCollapsed && <span>{item.name}</span>}
+            </Link>
+          ))}
+        </div>
+
+        <div className="space-y-1 mt-8">
+          <div className="flex items-center justify-between mb-3">
+            {!isSidebarCollapsed && (
+              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Features
+              </div>
+            )}
+            <button
+              aria-label={isFeaturesOpen ? 'Collapse features' : 'Expand features'}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-2 00"
+              onClick={() => {
+                const next = !isFeaturesOpen;
+                setIsFeaturesOpen(next);
+                try { localStorage.setItem('nav.features.open', String(next)); } catch {}
+              }}
+            >
+              {!isSidebarCollapsed && (isFeaturesOpen ? '−' : '+')}
+            </button>
+          </div>
+          {(isFeaturesOpen || isSidebarCollapsed) && moreNavItems.map((item) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <item.icon className={`${isSidebarCollapsed ? 'w-6 h-6' : 'w-5 h-5'} accent-on-hover`} />
+              {!isSidebarCollapsed && <span>{item.name}</span>}
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      {/* User Section */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="rounded-full w-8 h-8"
+          >
+            {isDarkMode ? '☀️' : '🌙'}
+          </Button>
+          {/* Theme & Contrast Panel */}
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setIsThemePanelOpen(v => !v)}
+              className="rounded-full w-8 h-8"
+              title="Theme & Contrast"
+            >
+              <Palette className="w-4 h-4" />
+            </Button>
+            {isThemePanelOpen && (
+              <div className="absolute bottom-12 left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 w-56 shadow-lg z-50">
+                <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-2">Appearance</div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-700 dark:text-gray-300">High Contrast</span>
+                  <Button variant="outline" size="sm" onClick={() => setIsHighContrast(v => !v)}>
+                    {isHighContrast ? 'On' : 'Off'}
+                  </Button>
+                </div>
+                <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 mt-3 mb-1">Accent</div>
+                <div className="grid grid-cols-6 gap-2">
+                  {['#ea580c','#3b82f6','#22c55e','#a855f7','#ec4899','#06b6d4'].map(c => (
+                    <button
+                      key={c}
+                      onClick={() => setAccentColor(c)}
+                      className={`w-6 h-6 rounded-full border ${accentColor===c ? 'ring-2 ring-offset-2' : ''}`}
+                      style={{ background: c }}
+                      aria-label={`Set accent ${c}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          {isLoggedIn ? (
+            <div className="flex-1 space-y-2">
+              {!isSidebarCollapsed && (
+                <Link to="/profile" className="block">
+                  <Button 
+                    variant="outline"
+                    className="w-full flex items-center space-x-2 text-sm"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Profile</span>
+                  </Button>
+                </Link>
+              )}
+              <Button 
+                variant="ghost"
+                size="sm"
+                className="w-full text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                onClick={() => {
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('userName');
+                  setIsLoggedIn(false);
+                  navigate('/');
+                }}
+              >
+                {!isSidebarCollapsed ? 'Logout' : '↩'}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex-1 space-y-2">
+              {!isSidebarCollapsed && (
+              <Button 
+                variant="ghost"
+                size="sm"
+                className="w-full text-sm"
+                onClick={() => navigate('/login')}
+              >
+                Login
+              </Button>
+              )}
+              <Button 
+                size="sm"
+                className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-sm"
+                onClick={() => navigate('/register')}
+              >
+                {!isSidebarCollapsed ? 'Sign Up' : '+'}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+      </motion.aside>
+      
+      {/* Mobile Menu Button */}
+      <div className="fixed top-4 left-4 z-50 lg:hidden">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="bg-white dark:bg-gray-900 shadow-lg"
+        >
+          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </Button>
+      </div>
+    </>
   );
 };
 
@@ -230,7 +481,7 @@ const HeroSection: React.FC = () => (
           <Button 
             size="lg" 
             className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-lg px-8 py-4"
-            onClick={() => window.location.href = '/register'}
+            onClick={() => navigate('/register')}
           >
             Start Learning
             <ChevronRight className="w-5 h-5 ml-2" />
@@ -239,7 +490,7 @@ const HeroSection: React.FC = () => (
             variant="outline" 
             size="lg" 
             className="text-lg px-8 py-4"
-            onClick={() => window.location.href = '/skills'}
+            onClick={() => navigate('/skills')}
           >
             <Play className="w-5 h-5 mr-2" />
             Watch Demo
@@ -287,6 +538,16 @@ const SkillsPage: React.FC = () => {
   const [newSkillName, setNewSkillName] = useState('');
   const [newSkillCategory, setNewSkillCategory] = useState('');
   const [newSkillLevel, setNewSkillLevel] = useState(1);
+  const [openSkill, setOpenSkill] = useState<null | 'Java' | 'Python'>(null);
+  const [skillOverview, setSkillOverview] = useState<Record<string, SkillOverview>>({});
+
+  const ensureOverview = async (name: string) => {
+    if (skillOverview[name]) return;
+    try {
+      const data = await fetchSkillOverview(name);
+      setSkillOverview(prev => ({ ...prev, [name]: data }));
+    } catch {}
+  };
 
   const addSkill = async () => {
     if (newSkillName && newSkillCategory) {
@@ -430,7 +691,18 @@ const SkillsPage: React.FC = () => {
                 whileHover={{ y: -5 }}
                 className="group"
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-purple-50 dark:group-hover:from-gray-800 dark:group-hover:to-gray-700">
+                <Card 
+                  className="h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-purple-50 dark:group-hover:from-gray-800 dark:group-hover:to-gray-700 cursor-pointer"
+                  onClick={async () => {
+                    await ensureOverview(skill.name);
+                    if (skill.name === 'Java' || skill.name === 'Python') {
+                      setOpenSkill(skill.name);
+                    } else {
+                      // Default to Java modal for now (structure shared); content shows fetched overview
+                      setOpenSkill('Java');
+                    }
+                  }}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">{skill.name}</h3>
@@ -464,6 +736,12 @@ const SkillsPage: React.FC = () => {
             )}
           </AnimatePresence>
         </div>
+        <SkillDetailModal
+          skillName={openSkill ?? 'Java'}
+          isOpen={openSkill !== null}
+          onClose={() => setOpenSkill(null)}
+          overview={openSkill ? (skillOverview['Java'] || skillOverview['Python'] || Object.values(skillOverview)[0]) : undefined}
+        />
       </div>
     </div>
   );
@@ -742,6 +1020,55 @@ const UsersPage: React.FC = () => {
 
 // Main App Component
 const App: React.FC = () => {
+  // Mock user progress state - in a real app, this would come from context/API
+  const [userProgress, setUserProgress] = useState({
+    userId: 'user-123',
+    name: 'John Doe',
+    currentLevel: 12,
+    totalXP: 8500,
+    currentStreak: 7,
+    longestStreak: 15,
+    lastActivityDate: new Date().toISOString(),
+    completedTasks: ['task-1', 'task-2', 'task-3'],
+    skillLevels: {
+      'React': 8,
+      'JavaScript': 7,
+      'TypeScript': 6,
+      'Node.js': 5,
+      'Python': 4
+    },
+    badges: ['early-bird', 'streak-master', 'skill-warrior'],
+    coins: 2500,
+    dailyTasksCompleted: 2,
+    weeklyGoal: 10,
+    monthlyGoal: 40,
+    inspirationPoints: 150
+  });
+
+  const handleProgressUpdate = (newProgress: any) => {
+    setUserProgress(newProgress);
+  };
+
+  const handleCoinsUpdate = (newCoins: number) => {
+    setUserProgress(prev => ({ ...prev, coins: newCoins }));
+  };
+
+  const handleInspirationPointsUpdate = (points: number) => {
+    setUserProgress(prev => ({ 
+      ...prev, 
+      inspirationPoints: (prev.inspirationPoints || 0) + points 
+    }));
+  };
+
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      const v = localStorage.getItem('nav.sidebar.collapsed');
+      return v === 'true';
+    } catch {
+      return false;
+    }
+  });
+
   return (
     <Router 
       future={{
@@ -749,25 +1076,46 @@ const App: React.FC = () => {
         v7_relativeSplatPath: true
       }}
     >
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<HeroSection />} />
-          <Route path="/skills" element={<SkillsPage />} />
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/verified-professionals" element={<VerifiedProfessionals />} />
-          <Route path="/dreamseed" element={<DreamSeed />} />
-          <Route path="/calculator" element={<CalculatorPage />} />
-          <Route path="/ai-assistant" element={<AIAssistantPage />} />
-          <Route path="/skillgraph" element={<SkillGraphPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile-setup" element={<ProfileSetup />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          {/* Add more routes for other features */}
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/*" element={
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+            <Navbar isSidebarCollapsed={isSidebarCollapsed} onToggleSidebar={setIsSidebarCollapsed} />
+            <div className={`flex-1 ml-0 ${isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
+              <Routes>
+                <Route path="/home" element={<SkillChainHomepage />} />
+                <Route path="/problems" element={<ProblemsPage />} />
+                <Route path="/contests" element={<ContestsPage />} />
+                <Route path="/leaderboard" element={<LeaderboardPage />} />
+                <Route path="/editor" element={<CodeEditor problemCode="SUM2" problemName="Sum of Two Numbers" />} />
+                <Route path="/submissions" element={<SubmissionsPage />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/discussions" element={<DiscussionsPage />} />
+                <Route path="/skill-map" element={<SkillMap />} />
+                <Route path="/tasks" element={<TaskDashboard userProgress={userProgress} onProgressUpdate={handleProgressUpdate} />} />
+                <Route path="/marketplace" element={<RewardsChamber />} />
+                <Route path="/live-arena-story" element={<LiveArenaStory userProgress={userProgress} onInspirationPointsUpdate={handleInspirationPointsUpdate} />} />
+                <Route path="/ai-jobs" element={<AISkillMatch userProgress={userProgress} onResumeUpdate={() => {}} />} />
+                <Route path="/skills" element={<SkillsPage />} />
+                <Route path="/users" element={<UsersPage />} />
+                <Route path="/verified-professionals" element={<VerifiedProfessionals />} />
+                <Route path="/dreamseed" element={<DreamSeed />} />
+                <Route path="/calculator" element={<CalculatorPage />} />
+                <Route path="/ai-assistant" element={<AIAssistantPage />} />
+                <Route path="/skillgraph" element={<SkillGraphPage />} />
+                <Route path="/community" element={<Community />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/profile-setup" element={<ProfileSetup />} />
+                <Route path="/user-profile" element={<Profile />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                {/* Legacy routes for backward compatibility */}
+                <Route path="/live-arena" element={<LiveArena userProgress={userProgress} onInspirationPointsUpdate={handleInspirationPointsUpdate} />} />
+              </Routes>
+            </div>
+          </div>
+        } />
+      </Routes>
     </Router>
   );
 };

@@ -42,6 +42,78 @@ export default function ExploreScreen() {
   );
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, backgroundColor: '#fff' }, searchContainer: { flexDirection: 'row', alignItems: 'center', margin: 16, borderWidth: 2, borderColor: '#000' }, searchIcon: { marginLeft: 12 }, searchInput: { flex: 1, padding: 12, fontSize: 16 }, listContent: { padding: 16 }, postCard: { borderWidth: 2, borderColor: '#000', padding: 16, marginBottom: 16 }, postHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }, badge: { paddingHorizontal: 8, paddingVertical: 4, fontSize: 12, fontWeight: 'bold' }, badgeOffer: { backgroundColor: '#000', color: '#fff' }, badgeRequest: { borderWidth: 2, borderColor: '#000' }, postTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 }, postCategory: { fontSize: 14, color: '#666', marginBottom: 12 }, postFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, coinBadge: { flexDirection: 'row', alignItems: 'center', gap: 4 }, coinText: { fontSize: 16, fontWeight: 'bold' } });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    borderWidth: 2,
+    borderColor: '#000',
+  },
+  searchIcon: {
+    marginLeft: 12,
+  },
+  searchInput: {
+    flex: 1,
+    padding: 12,
+    fontSize: 16,
+  },
+  listContent: {
+    padding: 16,
+  },
+  postCard: {
+    borderWidth: 2,
+    borderColor: '#000',
+    padding: 16,
+    marginBottom: 16,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  badgeOffer: {
+    backgroundColor: '#000',
+    color: '#fff',
+  },
+  badgeRequest: {
+    borderWidth: 2,
+    borderColor: '#000',
+  },
+  postTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  postCategory: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+  },
+  postFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  coinBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  coinText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
 
 

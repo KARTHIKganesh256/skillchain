@@ -1,99 +1,71 @@
 # SkillChain Mobile App
 
-React Native mobile application for SkillChain built with Expo.
+A React Native mobile app built with Expo for the SkillChain platform.
 
-## 🚀 Getting Started
+## Features
+
+- User authentication with Firebase
+- Skill posting and browsing
+- Real-time messaging
+- User profiles and statistics
+- SkillCoin balance management
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- Expo CLI: `npm install -g expo-cli`
-- iOS Simulator (Mac only) or Android Studio
+- Node.js (v16 or higher)
+- Expo CLI (`npm install -g @expo/cli`)
+- iOS Simulator (for iOS development) or Android Studio (for Android development)
 
 ### Installation
 
-1. Navigate to mobile directory:
-   ```bash
-   cd mobile
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create `.env` file:
-   ```env
-   EXPO_PUBLIC_FIREBASE_API_KEY=your-api-key
-   EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
-   EXPO_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-   EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
-   EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-   EXPO_PUBLIC_FIREBASE_APP_ID=your-app-id
-   EXPO_PUBLIC_API_URL=http://localhost:5000/api
-   ```
-
-### Running the App
-
+1. Install dependencies:
 ```bash
-# Start development server
-npm start
-
-# Run on iOS
-npm run ios
-
-# Run on Android
-npm run android
-
-# Run on web
-npm run web
+npm install
 ```
 
-## 📱 Features
+2. Set up environment variables:
+   - Copy `env-mobile.txt` to `.env`
+   - Update the Firebase configuration with your project details
 
-- User authentication (Email, Google)
-- Browse and search skills
-- Create skill posts
-- Real-time messaging
-- SkillCoin balance tracking
-- User profiles
-- Push notifications
+3. Start the development server:
+```bash
+npm start
+```
 
-## 🏗️ Project Structure
+### Available Scripts
+
+- `npm start` - Start the Expo development server
+- `npm run android` - Run on Android device/emulator
+- `npm run ios` - Run on iOS device/simulator
+- `npm run web` - Run on web browser
+
+### Building for Production
+
+- `npm run build:android` - Build Android APK
+- `npm run build:ios` - Build iOS app
+- `npm run build:web` - Build web version
+
+## Project Structure
 
 ```
 mobile/
 ├── src/
-│   ├── screens/       # App screens
-│   ├── components/    # Reusable components
-│   ├── contexts/      # React contexts
-│   ├── navigation/    # Navigation setup
-│   └── utils/         # Utilities
-├── assets/           # Images and assets
-├── App.js           # Main app component
-└── app.json         # Expo configuration
+│   ├── contexts/          # React contexts (Auth, etc.)
+│   └── screens/           # App screens
+├── assets/               # Images, icons, etc.
+├── App.js               # Main app component
+├── app.json             # Expo configuration
+└── package.json         # Dependencies and scripts
 ```
 
-## 📦 Building for Production
+## Technologies Used
 
-```bash
-# Build for iOS
-expo build:ios
-
-# Build for Android
-expo build:android
-```
-
-## 🔧 Configuration
-
-Update `app.json` with your app details:
-- App name
-- Bundle identifier
-- Version
-- Icons and splash screens
-
-## 📄 License
-
-MIT
-
-
+- React Native
+- Expo SDK 51
+- React Navigation
+- Firebase Authentication
+- Firebase Firestore
+- React Native Vector Icons
+- AsyncStorage

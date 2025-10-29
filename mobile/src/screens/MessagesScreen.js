@@ -36,6 +36,57 @@ export default function MessagesScreen() {
   );
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, backgroundColor: '#fff' }, chatItem: { flexDirection: 'row', padding: 16, alignItems: 'center' }, avatar: { marginRight: 12 }, chatContent: { flex: 1 }, chatHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }, userName: { fontSize: 16, fontWeight: 'bold' }, time: { fontSize: 12, color: '#666' }, lastMessage: { fontSize: 14, color: '#666' }, unreadBadge: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }, unreadText: { color: '#fff', fontSize: 12, fontWeight: 'bold' }, separator: { height: 2, backgroundColor: '#000', marginLeft: 76 } });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  chatItem: {
+    flexDirection: 'row',
+    padding: 16,
+    alignItems: 'center',
+  },
+  avatar: {
+    marginRight: 12,
+  },
+  chatContent: {
+    flex: 1,
+  },
+  chatHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  time: {
+    fontSize: 12,
+    color: '#666',
+  },
+  lastMessage: {
+    fontSize: 14,
+    color: '#666',
+  },
+  unreadBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  unreadText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  separator: {
+    height: 2,
+    backgroundColor: '#000',
+    marginLeft: 76,
+  },
+});
 
 

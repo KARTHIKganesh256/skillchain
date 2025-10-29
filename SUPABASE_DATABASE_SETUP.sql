@@ -1,3 +1,19 @@
+-- SkillChain user roles for admin permissions
+create table if not exists public.user_roles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  role text not null check (role in ('admin','user')) default 'user',
+  created_at timestamp with time zone default now()
+);
+
+-- Allow authenticated users to read their own role
+create policy if not exists "Users can read their role"
+on public.user_roles for select
+to authenticated
+using (auth.uid() = user_id);
+
+-- Only service role (server) may insert/update roles; disable by default
+alter table public.user_roles enable row level security;
+
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 

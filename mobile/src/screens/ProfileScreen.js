@@ -70,6 +70,70 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, backgroundColor: '#fff' }, header: { alignItems: 'center', padding: 32, borderBottomWidth: 2, borderBottomColor: '#000' }, avatarContainer: { marginBottom: 16 }, name: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 }, email: { fontSize: 14, color: '#666' }, statsContainer: { flexDirection: 'row', padding: 16, gap: 16 }, statBox: { flex: 1, borderWidth: 2, borderColor: '#000', padding: 16, alignItems: 'center' }, statValue: { fontSize: 24, fontWeight: 'bold', marginTop: 8 }, statLabel: { fontSize: 12, color: '#666', marginTop: 4 }, menuContainer: { marginTop: 16 }, menuItem: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 2, borderBottomColor: '#000' }, menuText: { flex: 1, fontSize: 16, fontWeight: '600', marginLeft: 16 }, logoutItem: { borderBottomWidth: 0 } });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    alignItems: 'center',
+    padding: 32,
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  avatarContainer: {
+    marginBottom: 16,
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  email: {
+    fontSize: 14,
+    color: '#666',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 16,
+  },
+  statBox: {
+    flex: 1,
+    borderWidth: 2,
+    borderColor: '#000',
+    padding: 16,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+  },
+  menuContainer: {
+    marginTop: 16,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  menuText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 16,
+  },
+  logoutItem: {
+    borderBottomWidth: 0,
+  },
+});
 
 
