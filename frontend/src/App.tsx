@@ -1077,12 +1077,14 @@ const App: React.FC = () => {
       }}
     >
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/*" element={
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
             <Navbar isSidebarCollapsed={isSidebarCollapsed} onToggleSidebar={setIsSidebarCollapsed} />
             <div className={`flex-1 ml-0 ${isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
               <Routes>
+                <Route path="/" element={<SkillChainHomepage />} />
                 <Route path="/home" element={<SkillChainHomepage />} />
                 <Route path="/problems" element={<ProblemsPage />} />
                 <Route path="/contests" element={<ContestsPage />} />
@@ -1104,8 +1106,6 @@ const App: React.FC = () => {
                 <Route path="/ai-assistant" element={<AIAssistantPage />} />
                 <Route path="/skillgraph" element={<SkillGraphPage />} />
                 <Route path="/community" element={<Community />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
                 <Route path="/profile-setup" element={<ProfileSetup />} />
                 <Route path="/user-profile" element={<Profile />} />
                 <Route path="/dashboard" element={<Dashboard />} />
