@@ -2,7 +2,7 @@
   "name": "skillchain-frontend",
   "version": "1.0.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://karthikganesh256.github.io/skillchain",
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@radix-ui/react-avatar": "^1.0.4",
